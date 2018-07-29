@@ -66,6 +66,7 @@ namespace Carlsound
 			bool mBypass = false;
 
 			Steinberg::Vst::VoiceProcessor* voiceProcessor;
+			Steinberg::Vst::NoteExpressionSynth::GlobalParameterState* paramState;
 		};
 		
 	//------------------------------------------------------------------------

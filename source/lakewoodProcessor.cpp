@@ -77,11 +77,25 @@ namespace Carlsound
 				{
 					if (processSetup.symbolicSampleSize == Steinberg::Vst::kSample32)
 					{
-						voiceProcessor = new Steinberg::Vst::VoiceProcessorImplementation<float, Steinberg::Vst::NoteExpressionSynth::Voice<float>, 2, MAX_VOICES, GlobalParameterState> ((float)processSetup.sampleRate, &paramState);
+						voiceProcessor = new Steinberg::Vst::VoiceProcessorImplementation
+						<
+							float, 
+							Steinberg::Vst::NoteExpressionSynth::Voice<float>, 
+							2,
+							MAX_VOICES, 
+							Steinberg::Vst::NoteExpressionSynth::GlobalParameterState
+						> ((float)processSetup.sampleRate, &paramState);
 					}
 					else if (processSetup.symbolicSampleSize == Steinberg::Vst::kSample64)
 					{
-						voiceProcessor = new Steinberg::Vst::VoiceProcessorImplementation<double, Steinberg::Vst::NoteExpressionSynth::Voice<double>, 2, MAX_VOICES, GlobalParameterState> ((float)processSetup.sampleRate, &paramState);
+						voiceProcessor = new Steinberg::Vst::VoiceProcessorImplementation
+						<
+							double, 
+							Steinberg::Vst::NoteExpressionSynth::Voice<double>, 
+							2, 
+							MAX_VOICES, 
+							Steinberg::Vst::NoteExpressionSynth::GlobalParameterState
+						> ((float)processSetup.sampleRate, &paramState);
 					}
 					else
 					{
@@ -171,6 +185,7 @@ namespace Carlsound
 								break;
 							}
 								//-----------------------
+							/*
 							case Steinberg::Vst::Event::kNoteExpressionValueEvent:
 							{
 								// here are the Note Expression interpretation
@@ -181,10 +196,22 @@ namespace Carlsound
 									// we have to find the voice which should be change (the note could be in released state)
 									if(data.symbolicSampleSize == Steinberg::Vst::kSample32) // 32-Bit
 									{
-										Steinberg::Vst::NoteExpressionSynth::Voice<Steinberg::Vst::Sample32> * voice;
-
-
-										//voice = findVoice (e.noteExpressionValue.noteId);
+										Steinberg::Vst::NoteExpressionSynth::Voice
+										<
+											Steinberg::Vst::Sample32
+										> * voice;
+											
+										voice = Steinberg::Vst::VoiceProcessorImplementation
+										<
+											Steinberg::Vst::Sample32,
+											Steinberg::Vst::NoteExpressionSynth::Voice
+											<
+											Steinberg::Vst::Sample32
+											>,
+											2,
+											MAX_VOICES,
+											Steinberg::Vst::NoteExpressionSynth::GlobalParameterState
+										>::findVoice (e.noteExpressionValue.noteId);
 										for(int i = 0; i < voiceProcessor->getActiveVoices(); i++)
 										{
 
@@ -214,6 +241,7 @@ namespace Carlsound
 								}
 								break;
 							}
+							*/
 						}
 					}
 				}
