@@ -3,6 +3,7 @@
 #include "maximilian.h"
 //
 #include "public.sdk/source/vst/vstaudioeffect.h"
+#include "pluginterfaces/vst/ivstevents.h"
 //
 namespace Carlsound 
 {

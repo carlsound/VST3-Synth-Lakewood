@@ -115,7 +115,7 @@ namespace Carlsound
 			Steinberg::Vst::IEventList* inputEvents = data.inputEvents;
 			if (inputEvents)
 			{
-				Steinberg::Event e;
+				Steinberg::Vst::Event e;
 				Steinberg::int32 numEvents = inputEvents->getEventCount ();
 
 				// for each events check it..
