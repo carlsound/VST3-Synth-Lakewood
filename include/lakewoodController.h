@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include "public.sdk/source/vst/vsteditcontroller.h"
 #include "pluginterfaces/vst/ivsteditcontroller.h"
 #include "pluginterfaces/vst/ivstnoteexpression.h"
