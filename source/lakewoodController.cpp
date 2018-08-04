@@ -91,20 +91,7 @@ namespace Carlsound
 			//
 			return Steinberg::kResultOk;
 		}
-
-		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::getMidiControllerAssignment
-		(
-			Steinberg::int32 busIndex,
-			Steinberg::int16 channel,
-			Steinberg::Vst::CtrlNumber midiControllerNumber,
-			Steinberg::Vst::ParamID& id
-		)
-		{
-			throw std::logic_error("The method or operation is not implemented.");
-		}
 		
-		/*
 		//-----------------------------------------------------------------------------
 		//------------------------------------------------------------------------
 		Steinberg::int32 LakewoodController::getNoteExpressionCount
@@ -208,8 +195,6 @@ namespace Carlsound
 			}
 			return Steinberg::kResultFalse;
 		}
-
-		*/
 
 		//-----------------------------------------------------------------------------
 
