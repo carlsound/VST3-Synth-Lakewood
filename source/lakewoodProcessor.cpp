@@ -17,10 +17,7 @@ namespace Carlsound
 		}
 
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::initialize
-		(
-				FUnknown* context
-				)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::initialize (FUnknown* context)
 		{
 			//---always initialize the parent-------
 					Steinberg::tresult result = AudioEffect::initialize (context);
@@ -29,11 +26,24 @@ namespace Carlsound
 
 			//---create Audio In/Out buses------
 			// we want a stereo Input and a Stereo Output
-			addAudioInput (STR16 ("AudioInput"), Steinberg::Vst::SpeakerArr::kStereo);
-			addAudioOutput (STR16 ("AudioOutput"), Steinberg::Vst::SpeakerArr::kStereo);
+			addAudioInput
+			(
+				STR16 ("AudioInput"), 
+				Steinberg::Vst::SpeakerArr::kStereo
+			);
+			
+			addAudioOutput 
+			(
+				STR16 ("AudioOutput"), 
+				Steinberg::Vst::SpeakerArr::kStereo
+			);
 
 			// create Event In bus (1 bus with only 1 channel)
-			addEventInput (STR16 ("EventInput"), 1);
+			addEventInput 
+			(
+				STR16 ("EventInput"), 
+				1
+			);
 
 			return Steinberg::kResultTrue;
 		}
@@ -49,77 +59,50 @@ namespace Carlsound
 			// we only support one in and output bus and these buses must have the same number of channels
 			if (numIns == 1 && numOuts == 1 && inputs[0] == outputs[0])
 			{
-				return Steinberg::Vst::AudioEffect::setBusArrangements (inputs, numIns, outputs, numOuts);
+				return Steinberg::Vst::AudioEffect::setBusArrangements 
+				(
+					inputs, 
+					numIns, 
+					outputs, 
+					numOuts
+				);
 			}
 			return Steinberg::kResultFalse;
 		}
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::setupProcessing
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::setupProcessing 
 		(
-				Steinberg::Vst::ProcessSetup& setup
-				)
+			Steinberg::Vst::ProcessSetup& setup
+		)
 		{
 			// here you get, with setup, information about:
 			// sampleRate, processMode, maximum number of samples per audio block
 			return Steinberg::Vst::AudioEffect::setupProcessing (setup);
 		}
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::setActive
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::setActive 
 		(
-				Steinberg::TBool state
-				)
+			Steinberg::TBool state
+		)
 		{
 			if (state) // Initialize
 			{
 				// Allocate Memory Here
 				// Ex: algo.create ();
-				if (voiceProcessor == nullptr)
-				{
-					if (processSetup.symbolicSampleSize == Steinberg::Vst::kSample32)
-					{
-						voiceProcessor = new Steinberg::Vst::VoiceProcessorImplementation
-						<
-							float, 
-							Steinberg::Vst::NoteExpressionSynth::Voice<float>, 
-							2,
-							MAX_VOICES, 
-							Steinberg::Vst::NoteExpressionSynth::GlobalParameterState
-						> ((float)processSetup.sampleRate, &paramState);
-					}
-					else if (processSetup.symbolicSampleSize == Steinberg::Vst::kSample64)
-					{
-						voiceProcessor = new Steinberg::Vst::VoiceProcessorImplementation
-						<
-							double, 
-							Steinberg::Vst::NoteExpressionSynth::Voice<double>, 
-							2, 
-							MAX_VOICES, 
-							Steinberg::Vst::NoteExpressionSynth::GlobalParameterState
-						> ((float)processSetup.sampleRate, &paramState);
-					}
-					else
-					{
-						return Steinberg::kInvalidArgument;
-					}
-				}
 			}
 			else // Release
 			{
 				// Free Memory if still allocated
 				// Ex: if(algo.isCreated ()) { algo.destroy (); }
-				if (voiceProcessor)
-				{
-					delete voiceProcessor;
-				}
-				voiceProcessor = nullptr;
 			}
 			return Steinberg::Vst::AudioEffect::setActive (state);
 		}
+
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::process
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::process 
 		(
-				Steinberg::Vst::ProcessData& data
-				)
+			Steinberg::Vst::ProcessData& data
+		)
 		{
 			//--- Read inputs parameter changes-----------
 			if (data.inputParameterChanges)
@@ -137,18 +120,30 @@ namespace Carlsound
 						switch (paramQueue->getParameterId ())
 						{
 							case LakewoodParams::kParamVolId:
-								if (paramQueue->getPoint (numPoints - 1, sampleOffset, value) ==
-									Steinberg::kResultTrue)
+								if 
+									(
+										paramQueue->getPoint (numPoints - 1, sampleOffset, value) 
+										==
+										Steinberg::kResultTrue
+									)
 									mParam1 = value;
 								break;
 							case LakewoodParams::kParamOnId:
-								if (paramQueue->getPoint (numPoints - 1, sampleOffset, value) ==
-									Steinberg::kResultTrue)
+								if 
+									(
+										paramQueue->getPoint (numPoints - 1, sampleOffset, value) 
+										==
+										Steinberg::kResultTrue
+									)
 									mParam2 = value > 0 ? 1 : 0;
 								break;
 							case LakewoodParams::kBypassId:
-								if (paramQueue->getPoint (numPoints - 1, sampleOffset, value) ==
-									Steinberg::kResultTrue)
+								if 
+									(
+										paramQueue->getPoint (numPoints - 1, sampleOffset, value) 
+										==
+										Steinberg::kResultTrue
+									)
 									mBypass = (value > 0.5f);
 								break;
 						}
@@ -167,7 +162,7 @@ namespace Carlsound
 				// for each events check it..
 				for (Steinberg::int32 i = 0; i < numEvents; i++)
 				{
-                    if (inputEvents->getEvent (i, e) == Steinberg::kResultTrue)
+					if (inputEvents->getEvent (i, e) == Steinberg::kResultTrue)
 					{
 						switch (e.type)
 						{
@@ -185,63 +180,28 @@ namespace Carlsound
 								break;
 							}
 								//-----------------------
-							/*
 							case Steinberg::Vst::Event::kNoteExpressionValueEvent:
 							{
 								// here are the Note Expression interpretation
 
 								// we check and use only tuning expression
-                                if (e.noteExpressionValue.typeId == Steinberg::Vst::kTuningTypeID)
+								/*
+								if (e.noteExpressionValue.typeId == kTuningTypeID)
 								{
 									// we have to find the voice which should be change (the note could be in released state)
-									if(data.symbolicSampleSize == Steinberg::Vst::kSample32) // 32-Bit
+									
+									VoiceClass* voice = findVoice (e.noteExpressionValue.noteId);
+									if (voice)
 									{
-										Steinberg::Vst::NoteExpressionSynth::Voice
-										<
-											Steinberg::Vst::Sample32
-										> * voice;
-											
-										voice = Steinberg::Vst::VoiceProcessorImplementation
-										<
-											Steinberg::Vst::Sample32,
-											Steinberg::Vst::NoteExpressionSynth::Voice
-											<
-											Steinberg::Vst::Sample32
-											>,
-											2,
-											MAX_VOICES,
-											Steinberg::Vst::NoteExpressionSynth::GlobalParameterState
-										>::findVoice (e.noteExpressionValue.noteId);
-										for(int i = 0; i < voiceProcessor->getActiveVoices(); i++)
-										{
-
-										}
-
-										if (voice)
-										{
-											// we apply to it the wanted value (for a given type of note expression (detune, volume....)
-											voice->setNoteExpressionValue (e.noteExpressionValue.typeId, e.noteExpressionValue.value);
-										}
-										// if the associated id is not anymore marked as playing voice (end of release reached) we ignore the Note Expression Event
+										// we apply to it the wanted value (for a given type of note expression (detune, volume....)
+										voice->setNoteExpressionValue (e.noteExpressionValue.typeId, e.noteExpressionValue.value);
 									}
-									else // 64-Bit
-									{
-										Steinberg::Vst::NoteExpressionSynth::Voice<Steinberg::Vst::Sample64> * voice;
-
-										//voice = findVoice (e.noteExpressionValue.noteId);
-
-										if (voice)
-										{
-											// we apply to it the wanted value (for a given type of note expression (detune, volume....)
-											voice->setNoteExpressionValue (e.noteExpressionValue.typeId, e.noteExpressionValue.value);
-										}
-										// if the associated id is not anymore marked as playing voice (end of release reached) we ignore the Note Expression Event
-									}
-
+									// if the associated id is not anymore marked as playing voice (end of release reached) we ignore the Note Expression Event
+									
 								}
 								break;
+								*/
 							}
-							*/
 						}
 					}
 				}
@@ -263,12 +223,11 @@ namespace Carlsound
 			}
 			return Steinberg::kResultOk;
 		}
-
 		//------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::setState
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::setState 
 		(
-				Steinberg::IBStream* state
-				)
+			Steinberg::IBStream* state
+		)
 		{
 			if (!state)
 				return Steinberg::kResultFalse;
@@ -301,11 +260,12 @@ namespace Carlsound
 			//
 			return Steinberg::kResultOk;
 		}
+
 		//------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::getState
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::getState 
 		(
-				Steinberg::IBStream* state
-				)
+			Steinberg::IBStream* state
+		)
 		{
 			// here we need to save the model (preset or project)
 			float toSaveParam1 = mParam1;

@@ -92,6 +92,20 @@ namespace Carlsound
 			return Steinberg::kResultOk;
 		}
 
+		//-----------------------------------------------------------------------------
+		Steinberg::tresult PLUGIN_API LakewoodController::getMidiControllerAssignment
+		(
+			Steinberg::int32 busIndex,
+			Steinberg::int16 channel,
+			Steinberg::Vst::CtrlNumber midiControllerNumber,
+			Steinberg::Vst::ParamID& id
+		)
+		{
+			throw std::logic_error("The method or operation is not implemented.");
+		}
+		
+		/*
+		//-----------------------------------------------------------------------------
 		//------------------------------------------------------------------------
 		Steinberg::int32 LakewoodController::getNoteExpressionCount
 		(
@@ -118,7 +132,7 @@ namespace Carlsound
 			// and only 1 Note Expression (tuning)
 			if (busIndex == 0 && channel == 0 && noteExpressionIndex == 0)
 			{
-				std::memset
+				memset
 				(
 					&info, 
 					0, 
@@ -130,8 +144,8 @@ namespace Carlsound
 				USTRING("Tuning").copyTo(info.title, 128);
 				USTRING("Tun").copyTo(info.shortTitle, 128);
 				USTRING("Half Tone").copyTo(info.units, 128);
-				info.unitId = -1; // no unit wanted
-				info.associatedParameterId = -1; // no associated parameter wanted
+				info.unitID = -1; // no unit wanted
+				info.associatedParameterID = -1; // no associated parameter wanted
 				info.flags = Steinberg::Vst::NoteExpressionTypeInfo::kIsBipolar; // event is bipolar (centered)
 																 // for Tuning the convert functions are : plain = 240 * (norm - 0.5); norm = plain / 240 + 0.5;
 																 // we want to support only +/- one octave
@@ -154,13 +168,13 @@ namespace Carlsound
 			Steinberg::Vst::NoteExpressionTypeID id,
 			Steinberg::Vst::NoteExpressionValue valueNormalized,
 			Steinberg::Vst::String128 string
-		)
+		);
 		{
 			// here we use the id (not the index)
-			if (busIndex == 0 && channel == 0 && id == Steinberg::Vst::kTuningTypeID)
+			if (busIndex == 0 && channel == 0 && id == kTuningTypeID)
 			{
 				// here we have to convert a normalized value to a Tuning string representation
-				Steinberg::UString128 wrapper;
+				UString128 wrapper;
 				valueNormalized = (240 * valueNormalized) - 120; // compute half Tones
 				wrapper.printFloat(valueNormalized, 2);
 				wrapper.copyTo(string, 128);
@@ -178,14 +192,14 @@ namespace Carlsound
 			Steinberg::Vst::NoteExpressionTypeID id,
 			const Steinberg::Vst::TChar* string, 
 			Steinberg::Vst::NoteExpressionValue& valueNormalized
-		)
+		);
 		{
 			// here we use the id (not the index)
-			if (busIndex == 0 && channel == 0 && id == Steinberg::Vst::kTuningTypeID)
+			if (busIndex == 0 && channel == 0 && id == kTuningTypeID)
 			{
 				// here we have to convert a given tuning string (half Tone) to a normalized value
-				Steinberg::String wrapper((Steinberg::Vst::TChar*)string);
-				Steinberg::Vst::ParamValue tmp;
+				String wrapper((TChar*)string);
+				ParamValue tmp;
 				if (wrapper.scanFloat(tmp))
 				{
 					valueNormalized = (tmp + 120) / 240;
@@ -194,6 +208,8 @@ namespace Carlsound
 			}
 			return Steinberg::kResultFalse;
 		}
+
+		*/
 
 		//-----------------------------------------------------------------------------
 
