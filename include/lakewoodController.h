@@ -9,7 +9,9 @@ namespace Carlsound
 	namespace Lakewood 
 	{
 		//-----------------------------------------------------------------------------
-	class LakewoodController : public Steinberg::Vst::EditController, Steinberg::Vst::INoteExpressionController
+	class LakewoodController : public Steinberg::Vst::EditController, 
+		                              ///Steinberg::Vst::INoteExpressionController
+		                              Steinberg::Vst::IMidiMapping
 		{
 		public:
 			OBJ_METHODS(LakewoodController, EditController)
@@ -52,6 +54,16 @@ namespace Carlsound
 			) SMTG_OVERRIDE;
 			*/
 
+			//---from IMidiMapping---
+			virtual Steinberg::tresult PLUGIN_API getMidiControllerAssignment
+			(
+				Steinberg::int32 busIndex, 
+				Steinberg::int16 channel, 
+				Steinberg::Vst::CtrlNumber midiControllerNumber, 
+				Steinberg::Vst::ParamID& id
+			) override;
+
+			/*
 			//---from INoteExpressionController
 			Steinberg::int32 PLUGIN_API getNoteExpressionCount
 			(
@@ -84,7 +96,8 @@ namespace Carlsound
 				const Steinberg::Vst::TChar* string, 
 				Steinberg::Vst::NoteExpressionValue& valueNormalized
 			) SMTG_OVERRIDE;
-		};
+			*/
+	};
 
 //------------------------------------------------------------------------
 	} // namespace Lakewood
