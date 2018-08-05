@@ -5,6 +5,8 @@ set(synth_sources
     #---
     include/lakewoodIDs.h
     #---
+    include/lakewoodParameters.h
+    #---
     include/lakewoodProcessor.h
     source/lakewoodProcessor.cpp
     #---

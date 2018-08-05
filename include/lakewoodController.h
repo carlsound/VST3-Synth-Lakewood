@@ -14,11 +14,13 @@ namespace Carlsound
 		                              Steinberg::Vst::IMidiMapping
 		{
 		public:
+			/*
 			OBJ_METHODS(LakewoodController, EditController)
 			DEFINE_INTERFACES
 			DEF_INTERFACE(INoteExpressionController)
 			END_DEFINE_INTERFACES(EditController)
 			REFCOUNT_METHODS(EditController)
+			 */
 		//------------------------------------------------------------------------
 		// create function required for Plug-in factory,
 		// it will be called to create new instances of this controller
