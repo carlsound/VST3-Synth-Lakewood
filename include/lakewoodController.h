@@ -10,29 +10,32 @@ namespace Carlsound
 	{
 		//-----------------------------------------------------------------------------
 	class LakewoodController : public Steinberg::Vst::EditController, 
-		                              ///Steinberg::Vst::INoteExpressionController
-		                              Steinberg::Vst::IMidiMapping
+		                       //public Steinberg::Vst::INoteExpressionController
+		                       public Steinberg::Vst::IMidiMapping
 		{
 		public:
-			/*
+
 			OBJ_METHODS(LakewoodController, EditController)
+			//
 			DEFINE_INTERFACES
-			DEF_INTERFACE(INoteExpressionController)
+				//DEF_INTERFACE(INoteExpressionController)
+				DEF_INTERFACE(IMidiMapping)
 			END_DEFINE_INTERFACES(EditController)
+			//
 			REFCOUNT_METHODS(EditController)
-			 */
+
 		//------------------------------------------------------------------------
 		// create function required for Plug-in factory,
 		// it will be called to create new instances of this controller
 		//------------------------------------------------------------------------
-			static Steinberg::FUnknown* createInstance 
+			static Steinberg::FUnknown* createInstance
 			(
 				void*
 			)
 			{
 				return (Steinberg::Vst::IEditController*)new LakewoodController ();
 			}
-		
+
 			//---from IPluginBase--------
 			Steinberg::tresult PLUGIN_API initialize 
 			(
