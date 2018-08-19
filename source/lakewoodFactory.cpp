@@ -4,7 +4,7 @@
 //
 #include "../include/lakewoodController.h"	// for createInstance
 #include "../include/lakewoodProcessor.h"	// for createInstance
-#include "../include/lakewoodIDs.h"			// for uids
+#include "../include/lakewoodUIDs.h"			// for UIDs
 #include "../include/lakewoodVersion.h"		// for version and naming
 //
 #define stringSubCategory	"Instrument|Synth"	// Subcategory for this Plug-in (to be changed if needed, see PlugType in ivstaudioprocessor.h)
@@ -20,7 +20,7 @@ DEF_CLASS2
 (
 	INLINE_UID_FROM_FUID
 	(
-		Carlsound::Lakewood::MyProcessorUID
+		Carlsound::Lakewood::LakewoodProcessorUID
 	),
 	Steinberg::PClassInfo::kManyInstances,	// cardinality  
 	kVstAudioEffectClass,	// the component category (do not changed this)
@@ -36,7 +36,7 @@ DEF_CLASS2
 (
 	INLINE_UID_FROM_FUID
 	(
-		Carlsound::Lakewood::MyControllerUID
+		Carlsound::Lakewood::LakewoodControllerUID
 	),
 	Steinberg::PClassInfo::kManyInstances,  // cardinality   
 	kVstComponentControllerClass,// the Controller category (do not changed this)

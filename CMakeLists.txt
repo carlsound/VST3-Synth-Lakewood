@@ -2,17 +2,17 @@
 set(synth_sources
     include/lakewoodController.h
     source/lakewoodController.cpp
-    #---
-    include/lakewoodIDs.h
+     #---
+    source/lakewoodFactory.cpp
     #---
     include/lakewoodParameters.h
     #---
     include/lakewoodProcessor.h
     source/lakewoodProcessor.cpp
+	#---
+    include/lakewoodUIDs.h
     #---
     include/lakewoodVersion.h
-    #---
-    source/lakewoodFactory.cpp
     #---
     #---https://github.com/micknoise/Maximilian
     include/maximilian.h

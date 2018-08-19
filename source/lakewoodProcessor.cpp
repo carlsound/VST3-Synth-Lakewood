@@ -1,10 +1,5 @@
 #include "../include/lakewoodProcessor.h"
-#include "../include/lakewoodIDs.h"
-
-#include "base/source/fstreamer.h"
-#include "pluginterfaces/base/ibstream.h"
-#include "pluginterfaces/vst/ivstparameterchanges.h"
-
+//
 namespace Carlsound 
 {
 	namespace Lakewood
@@ -13,7 +8,7 @@ namespace Carlsound
 		LakewoodProcessor::LakewoodProcessor ()
 		{
 			// register its editor class
-			setControllerClass (MyControllerUID);
+			setControllerClass (LakewoodControllerUID);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -119,7 +114,7 @@ namespace Carlsound
 						Steinberg::int32 numPoints = paramQueue->getPointCount ();
 						switch (paramQueue->getParameterId ())
 						{
-							case LakewoodParams::kParamVolId:
+							case LakewoodParameters::kParamQtyOctaves:
 								if 
 									(
 										paramQueue->getPoint (numPoints - 1, sampleOffset, value) 
@@ -127,24 +122,6 @@ namespace Carlsound
 										Steinberg::kResultTrue
 									)
 									mParam1 = value;
-								break;
-							case LakewoodParams::kParamOnId:
-								if 
-									(
-										paramQueue->getPoint (numPoints - 1, sampleOffset, value) 
-										==
-										Steinberg::kResultTrue
-									)
-									mParam2 = value > 0 ? 1 : 0;
-								break;
-							case LakewoodParams::kBypassId:
-								if 
-									(
-										paramQueue->getPoint (numPoints - 1, sampleOffset, value) 
-										==
-										Steinberg::kResultTrue
-									)
-									mBypass = (value > 0.5f);
 								break;
 						}
 					}
@@ -242,21 +219,7 @@ namespace Carlsound
 				return Steinberg::kResultFalse;
 			}
 			//
-			Steinberg::int32 savedParam2 = 0;
-			if (streamer.readInt32(savedParam2) == false)
-			{
-				return Steinberg::kResultFalse;
-			}
-			//
-			Steinberg::int32 savedBypass = 0;
-			if (streamer.readInt32(savedBypass) == false)
-			{
-				return Steinberg::kResultFalse;
-			}
-			//
 			mParam1 = savedParam1;
-			mParam2 = savedParam2 > 0 ? 1 : 0;
-			mBypass = savedBypass > 0;
 			//
 			return Steinberg::kResultOk;
 		}
@@ -269,13 +232,9 @@ namespace Carlsound
 		{
 			// here we need to save the model (preset or project)
 			float toSaveParam1 = mParam1;
-			Steinberg::int32 toSaveParam2 = mParam2;
-			Steinberg::int32 toSaveBypass = mBypass ? 1 : 0;
 			//
 			Steinberg::IBStreamer streamer (state, kLittleEndian);
 			streamer.writeFloat (toSaveParam1);
-			streamer.writeInt32 (toSaveParam2);
-			streamer.writeInt32 (toSaveBypass);
 			//
 			return Steinberg::kResultOk;
 		}

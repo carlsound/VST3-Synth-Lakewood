@@ -2,8 +2,14 @@
 //
 #include "maximilian.h"
 //
-#include "public.sdk/source/vst/vstaudioeffect.h"
+#include "base/source/fstreamer.h"
+#include "pluginterfaces/base/ibstream.h"
 #include "pluginterfaces/vst/ivstevents.h"
+#include "pluginterfaces/vst/ivstparameterchanges.h"
+#include "public.sdk/source/vst/vstaudioeffect.h"
+//
+#include "lakewoodParameters.h"
+#include "../include/lakewoodUIDs.h"
 //
 namespace Carlsound 
 {
@@ -70,8 +76,8 @@ namespace Carlsound
 		//------------------------------------------------------------------------
 		protected:
 			Steinberg::Vst::ParamValue mParam1 = 0;
-			Steinberg::int16 mParam2 = 0;
-			bool mBypass = false;
+			//Steinberg::int16 mParam2 = 0;
+			//bool mBypass = false;
 		};
 		
 	//------------------------------------------------------------------------

@@ -1,10 +1,6 @@
 
 #include "../include/lakewoodController.h"
-#include "../include/lakewoodIDs.h"
-
-#include "base/source/fstreamer.h"
-#include "pluginterfaces/base/ibstream.h"
-
+//
 namespace Carlsound 
 {
 	namespace Lakewood 
@@ -19,37 +15,18 @@ namespace Carlsound
 			if (result == Steinberg::kResultTrue)
 			{
 				//---Create Parameters------------
-				parameters.addParameter
+				parameters.addParameter //public.sdk/source/vst/vstparameters.cpp
 				(
-					STR16 ("Bypass"), 
-					0, 
-					1, 
-					0,
-					Steinberg::Vst::ParameterInfo::kCanAutomate | Steinberg::Vst::ParameterInfo::kIsBypass,
-					LakewoodParams::kBypassId
+					STR16 ("Qty."), // title
+					STR16("Octaves"), // units
+					2, // int32 step count
+					0.0, // ParamValue default normalized value
+					Steinberg::Vst::ParameterInfo::kCanAutomate, // flags
+					LakewoodParameters::kParamQtyOctaves // int32 tag
+					// UnitID
+					// const TChar* short title
 				);
 
-				parameters.addParameter 
-				(
-					STR16 ("Parameter 1"), STR16 ("dB"), 
-					0, 
-					.5,
-					Steinberg::Vst::ParameterInfo::kCanAutomate,
-					LakewoodParams::kParamVolId, 
-					0,
-					STR16 ("Param1")
-				);
-				parameters.addParameter 
-				(
-					STR16 ("Parameter 2"), 
-					STR16 ("On/Off"), 
-					1, 
-					1.,
-					Steinberg::Vst::ParameterInfo::kCanAutomate,
-					LakewoodParams::kParamOnId, 
-					0,			
-					STR16 ("Param2")
-				);
 			}
 			return Steinberg::kResultTrue;
 		}
@@ -67,27 +44,23 @@ namespace Carlsound
 		
 			Steinberg::IBStreamer streamer (state, kLittleEndian);
 		
-			float savedParam1 = 0.f;
-			if (streamer.readFloat (savedParam1) == false)
+			float savedParameter1 = 0.f;
+			if (streamer.readFloat (savedParameter1) == false)
 			{
 				return Steinberg::kResultFalse;
 			}	
-			setParamNormalized (LakewoodParams::kParamVolId, savedParam1);
+			setParamNormalized (LakewoodParameters::kParamQtyOctaves, savedParameter1);
+
 			//
-			Steinberg::int8 savedParam2 = 0;
-			if (streamer.readInt8(savedParam2) == false)
-			{
-				return Steinberg::kResultFalse;
-			}
-			setParamNormalized (LakewoodParams::kParamOnId, savedParam2);
-		
 			// read the bypass
+			/*
 			Steinberg::int32 bypassState;
 			if (streamer.readInt32(bypassState) == false)
 			{
 				return Steinberg::kResultFalse;
 			}
 			setParamNormalized (kBypassId, bypassState ? 1 : 0);
+			*/
 			//
 			return Steinberg::kResultOk;
 		}
@@ -101,7 +74,26 @@ namespace Carlsound
 			Steinberg::Vst::ParamID& id
 		)
 		{
-			throw std::logic_error("The method or operation is not implemented.");
+			//throw std::logic_error("The method or operation is not implemented.");
+			if (busIndex == 0 && channel == 0)
+			{
+				id = 0;
+				switch (midiControllerNumber)
+				{
+					//case Steinberg::Vst::ControllerNumbers::kPitchBend: id = kParamMasterTuning; break;
+					//case Steinberg::Vst::ControllerNumbers::kCtrlVolume: id = kParamMasterVolume; break;
+					//case Steinberg::Vst::ControllerNumbers::kCtrlFilterCutoff: id = kParamFilterFreq; break;
+					//case Steinberg::Vst::ControllerNumbers::kCtrlFilterResonance: id = kParamFilterQ; break;
+					//
+					case Steinberg::Vst::ControllerNumbers::kCtrlGPC1:
+					{
+						id = kParamQtyOctaves;
+						break;
+					}
+				}
+				return id != 0 ? Steinberg::kResultTrue : Steinberg::kResultFalse;
+			}
+			return Steinberg::kResultFalse;
 		}
 		
 		/*
