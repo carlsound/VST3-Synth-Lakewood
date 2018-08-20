@@ -1,4 +1,5 @@
 #include "../include/lakewoodProcessor.h"
+#include "pluginterfaces/vst/ivstevents.h"
 //
 namespace Carlsound 
 {
@@ -133,20 +134,21 @@ namespace Carlsound
 			Steinberg::Vst::IEventList* inputEvents = data.inputEvents;
 			if (inputEvents)
 			{
-				Steinberg::Vst::Event e;
+				Steinberg::Vst::Event event;
 				Steinberg::int32 numEvents = inputEvents->getEventCount ();
 
 				// for each events check it..
 				for (Steinberg::int32 i = 0; i < numEvents; i++)
 				{
-					if (inputEvents->getEvent (i, e) == Steinberg::kResultTrue)
+					if (inputEvents->getEvent (i, event) == Steinberg::kResultTrue)
 					{
-						switch (e.type)
+						switch (event.type)
 						{
 							//-----------------------
 							case Steinberg::Vst::Event::kNoteOnEvent:
 							{
 								// here a note On, we may need to play something a keep a trace of the e.noteOn.noteId
+								mNoteActivated = event.noteOn.noteId;
 								break;
 							}
 								//-----------------------
@@ -154,6 +156,7 @@ namespace Carlsound
 							{
 								// here we have to release the voice associated to this id : e.noteOff.noteId
 								// Note that kNoteExpressionValueEvent event could be send after the note is in released
+								mNoteDeactivated = event.noteOff.noteId;
 								break;
 							}
 								//-----------------------
@@ -197,6 +200,59 @@ namespace Carlsound
 				// Process Algorithm
 				// Ex: algo.process (data.inputs[0].channelBuffers32, data.outputs[0].channelBuffers32,
 				// data.numSamples);
+				//
+				// assume the same input channel count as the output
+				Steinberg::int32 numChannels = data.inputs[0].numChannels;
+				//
+				//---get audio buffers----------------
+				Steinberg::uint32 sampleFramesSize = getSampleFramesSizeInBytes
+				(
+					processSetup,
+					data.numSamples
+				);
+				void** in = getChannelBuffersPointer
+				(
+					processSetup,
+					data.inputs[0]
+				);
+				void** out = getChannelBuffersPointer
+				(
+					processSetup,
+					data.outputs[0]
+				);
+				//
+				// mark our outputs has not silent
+				data.outputs[0].silenceFlags = 0;
+				//
+				for (int sample = 0; sample < data.numSamples; sample++)
+				{
+					
+					mAmplitude = mOscillator->sinewave(frequencies->getNoteFrequency(mNoteActivated));
+					//
+					for (int channel = 0; channel < data.outputs->numChannels; channel++)
+					{
+						if (data.symbolicSampleSize == Steinberg::Vst::kSample32) //32-Bit
+						{
+							outputBufferAmplitude
+							(
+								static_cast<Steinberg::Vst::Sample32*>(out[channel]),
+								sample,
+								mAmplitude
+							);
+						}
+						else // 64-Bit
+						{
+							outputBufferAmplitude
+							(
+								static_cast<Steinberg::Vst::Sample64*>(out[channel]),
+								sample,
+								mAmplitude
+							);
+						}
+					}
+				}
+				// Write outputs parameter changes-----------
+				Steinberg::Vst::IParameterChanges* outParamChanges = data.outputParameterChanges;
 			}
 			return Steinberg::kResultOk;
 		}

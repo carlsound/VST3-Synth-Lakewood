@@ -7,9 +7,11 @@
 #include "pluginterfaces/vst/ivstevents.h"
 #include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "public.sdk/source/vst/vstaudioeffect.h"
+#include "public.sdk/source/vst/vstaudioprocessoralgo.h"
 //
 #include "lakewoodParameters.h"
 #include "../include/lakewoodUIDs.h"
+#include "midiFrequencies.h"
 //
 namespace Carlsound 
 {
@@ -74,10 +76,27 @@ namespace Carlsound
 		}
 	
 		//------------------------------------------------------------------------
+		template <class T> void outputBufferAmplitude
+		(
+			T outBuffer,
+			const int sampleLocation,
+			const double amplitudeValue
+		);
+
+		//------------------------------------------------------------------------
 		protected:
 			Steinberg::Vst::ParamValue mParam1 = 0;
 			//Steinberg::int16 mParam2 = 0;
 			//bool mBypass = false;
+			Steinberg::int32 mNoteActivated = 0;
+			Steinberg::int32 mNoteDeactivated = 0;
+			//
+			midiFrequencies *frequencies;
+			//
+			std::shared_ptr<maxiSettings> mOscillatorSettings;
+			std::shared_ptr<maxiOsc> mOscillator;
+			//
+			double mAmplitude;
 		};
 		
 	//------------------------------------------------------------------------

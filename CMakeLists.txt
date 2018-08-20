@@ -17,6 +17,8 @@ set(synth_sources
     #---https://github.com/micknoise/Maximilian
     include/maximilian.h
     include/maximilian.cpp
+    #---
+    include/midiFrequencies.h
 )
 
 #--- HERE change the target Name for your plug-in (for ex. set(target myDelay))-------
