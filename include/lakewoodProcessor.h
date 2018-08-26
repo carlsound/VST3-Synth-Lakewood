@@ -56,6 +56,26 @@ namespace Carlsound
 		(
 			Steinberg::Vst::ProcessData& data
 		) SMTG_OVERRIDE;
+
+		Steinberg::tresult PLUGIN_API processInputParameterChanges
+		(
+			Steinberg::Vst::ProcessData& data
+		);
+
+		Steinberg::tresult PLUGIN_API processMidiEvents
+		(
+			Steinberg::Vst::ProcessData& data
+		);
+
+		Steinberg::tresult PLUGIN_API processAudio
+		(
+			Steinberg::Vst::ProcessData& data
+		);
+
+		Steinberg::tresult PLUGIN_API processOutputParameterChanges
+		(
+			Steinberg::Vst::ProcessData& data
+		);
 	
 		//------------------------------------------------------------------------
 		Steinberg::tresult PLUGIN_API setState 
@@ -76,13 +96,15 @@ namespace Carlsound
 		}
 	
 		//------------------------------------------------------------------------
-		template <class T> void outputBufferAmplitude
+		template <class T>
+		void outputBufferAmplitude
 		(
 			T outBuffer,
 			const int sampleLocation,
 			const double amplitudeValue
 		);
-
+		//------------------------------------------------------------------------
+		//------------------------------------------------------------------------
 		//------------------------------------------------------------------------
 		protected:
 			Steinberg::Vst::ParamValue mParam1 = 0;
@@ -91,7 +113,7 @@ namespace Carlsound
 			Steinberg::int32 mNoteActivated = 0;
 			Steinberg::int32 mNoteDeactivated = 0;
 			//
-			midiFrequencies *frequencies;
+			std::shared_ptr<midiFrequencies> mFrequencies;
 			//
 			std::shared_ptr<maxiSettings> mOscillatorSettings;
 			std::shared_ptr<maxiOsc> mOscillator;

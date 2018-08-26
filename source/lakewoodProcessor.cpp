@@ -1,5 +1,4 @@
 #include "../include/lakewoodProcessor.h"
-#include "pluginterfaces/vst/ivstevents.h"
 //
 namespace Carlsound 
 {
@@ -10,6 +9,11 @@ namespace Carlsound
 		{
 			// register its editor class
 			setControllerClass (LakewoodControllerUID);
+			//
+			mFrequencies = std::make_shared<midiFrequencies>();
+			//
+			mOscillatorSettings = std::make_shared<maxiSettings>();
+			mOscillator = std::make_shared<maxiOsc>();
 		}
 
 		//-----------------------------------------------------------------------------
@@ -93,9 +97,21 @@ namespace Carlsound
 			}
 			return Steinberg::Vst::AudioEffect::setActive (state);
 		}
-
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::process 
+		template <class T>
+		inline void LakewoodProcessor::outputBufferAmplitude
+		(
+			T outBuffer,
+			const int sampleLocation,
+			const double amplitudeValue
+		)
+		{
+			outBuffer = outBuffer + sampleLocation; // pointer arithmetic
+			//
+			*outBuffer = amplitudeValue;
+		}
+		//-----------------------------------------------------------------------------
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processInputParameterChanges
 		(
 			Steinberg::Vst::ProcessData& data
 		)
@@ -103,93 +119,106 @@ namespace Carlsound
 			//--- Read inputs parameter changes-----------
 			if (data.inputParameterChanges)
 			{
-				Steinberg::int32 numParamsChanged = data.inputParameterChanges->getParameterCount ();
+				Steinberg::int32 numParamsChanged = data.inputParameterChanges->getParameterCount();
 				for (Steinberg::int32 index = 0; index < numParamsChanged; index++)
 				{
 					Steinberg::Vst::IParamValueQueue* paramQueue =
-						data.inputParameterChanges->getParameterData (index);
+						data.inputParameterChanges->getParameterData(index);
 					if (paramQueue)
 					{
 						Steinberg::Vst::ParamValue value;
 						Steinberg::int32 sampleOffset;
-						Steinberg::int32 numPoints = paramQueue->getPointCount ();
-						switch (paramQueue->getParameterId ())
+						Steinberg::int32 numPoints = paramQueue->getPointCount();
+						switch (paramQueue->getParameterId())
 						{
-							case LakewoodParameters::kParamQtyOctaves:
-								if 
-									(
-										paramQueue->getPoint (numPoints - 1, sampleOffset, value) 
-										==
-										Steinberg::kResultTrue
+						case LakewoodParameters::kParamQtyOctaves:
+							if
+								(
+									paramQueue->getPoint(numPoints - 1, sampleOffset, value)
+									==
+									Steinberg::kResultTrue
 									)
-									mParam1 = value;
-								break;
+								mParam1 = value;
+							break;
 						}
 					}
 				}
 			}
-			//--- Process MIDI----------------------
-			//--- ----------------------------------
+			return Steinberg::kResultTrue;
+		}
+
+		//-----------------------------------------------------------------------------
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processMidiEvents
+		(
+			Steinberg::Vst::ProcessData& data
+		)
+		{
 			// get the input event queue
 			Steinberg::Vst::IEventList* inputEvents = data.inputEvents;
 			if (inputEvents)
 			{
 				Steinberg::Vst::Event event;
-				Steinberg::int32 numEvents = inputEvents->getEventCount ();
+				Steinberg::int32 numEvents = inputEvents->getEventCount();
 
 				// for each events check it..
 				for (Steinberg::int32 i = 0; i < numEvents; i++)
 				{
-					if (inputEvents->getEvent (i, event) == Steinberg::kResultTrue)
+					if (inputEvents->getEvent(i, event) == Steinberg::kResultTrue)
 					{
 						switch (event.type)
 						{
 							//-----------------------
-							case Steinberg::Vst::Event::kNoteOnEvent:
-							{
-								// here a note On, we may need to play something a keep a trace of the e.noteOn.noteId
-								mNoteActivated = event.noteOn.noteId;
-								break;
-							}
-								//-----------------------
-							case Steinberg::Vst::Event::kNoteOffEvent:
-							{
-								// here we have to release the voice associated to this id : e.noteOff.noteId
-								// Note that kNoteExpressionValueEvent event could be send after the note is in released
-								mNoteDeactivated = event.noteOff.noteId;
-								break;
-							}
-								//-----------------------
-							case Steinberg::Vst::Event::kNoteExpressionValueEvent:
-							{
-								// here are the Note Expression interpretation
+						case Steinberg::Vst::Event::kNoteOnEvent:
+						{
+							// here a note On, we may need to play something a keep a trace of the e.noteOn.noteId
+							mNoteActivated = event.noteOn.noteId;
+							break;
+						}
+						//-----------------------
+						case Steinberg::Vst::Event::kNoteOffEvent:
+						{
+							// here we have to release the voice associated to this id : e.noteOff.noteId
+							// Note that kNoteExpressionValueEvent event could be send after the note is in released
+							mNoteDeactivated = event.noteOff.noteId;
+							break;
+						}
+						//-----------------------
+						case Steinberg::Vst::Event::kNoteExpressionValueEvent:
+						{
+							// here are the Note Expression interpretation
 
-								// we check and use only tuning expression
-								/*
-								if (e.noteExpressionValue.typeId == kTuningTypeID)
+							// we check and use only tuning expression
+							/*
+							if (e.noteExpressionValue.typeId == kTuningTypeID)
+							{
+								// we have to find the voice which should be change (the note could be in released state)
+
+								VoiceClass* voice = findVoice (e.noteExpressionValue.noteId);
+								if (voice)
 								{
-									// we have to find the voice which should be change (the note could be in released state)
-									
-									VoiceClass* voice = findVoice (e.noteExpressionValue.noteId);
-									if (voice)
-									{
-										// we apply to it the wanted value (for a given type of note expression (detune, volume....)
-										voice->setNoteExpressionValue (e.noteExpressionValue.typeId, e.noteExpressionValue.value);
-									}
-									// if the associated id is not anymore marked as playing voice (end of release reached) we ignore the Note Expression Event
-									
+									// we apply to it the wanted value (for a given type of note expression (detune, volume....)
+									voice->setNoteExpressionValue (e.noteExpressionValue.typeId, e.noteExpressionValue.value);
 								}
-								break;
-								*/
+								// if the associated id is not anymore marked as playing voice (end of release reached) we ignore the Note Expression Event
+
 							}
+							break;
+							*/
+						}
 						}
 					}
 				}
 			}
+			return Steinberg::kResultTrue;
+		}
 
-			//--- Process Audio---------------------
-			//--- ----------------------------------
-			if (data.numInputs == 0 || data.numOutputs == 0)
+		//-----------------------------------------------------------------------------
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processAudio
+		(
+			Steinberg::Vst::ProcessData& data
+		)
+		{
+			if (data.numOutputs == 0)
 			{
 				// nothing to do
 				return Steinberg::kResultOk;
@@ -200,20 +229,13 @@ namespace Carlsound
 				// Process Algorithm
 				// Ex: algo.process (data.inputs[0].channelBuffers32, data.outputs[0].channelBuffers32,
 				// data.numSamples);
-				//
-				// assume the same input channel count as the output
-				Steinberg::int32 numChannels = data.inputs[0].numChannels;
+				Steinberg::int32 numChannels = data.outputs[0].numChannels;
 				//
 				//---get audio buffers----------------
-				Steinberg::uint32 sampleFramesSize = getSampleFramesSizeInBytes
+				Steinberg::uint32 sampleFramesSize = Steinberg::Vst::getSampleFramesSizeInBytes
 				(
 					processSetup,
 					data.numSamples
-				);
-				void** in = getChannelBuffersPointer
-				(
-					processSetup,
-					data.inputs[0]
 				);
 				void** out = getChannelBuffersPointer
 				(
@@ -226,8 +248,8 @@ namespace Carlsound
 				//
 				for (int sample = 0; sample < data.numSamples; sample++)
 				{
-					
-					mAmplitude = mOscillator->sinewave(frequencies->getNoteFrequency(mNoteActivated));
+
+					mAmplitude = mOscillator->sinewave(mFrequencies->getNoteFrequency(mNoteActivated));
 					//
 					for (int channel = 0; channel < data.outputs->numChannels; channel++)
 					{
@@ -251,9 +273,33 @@ namespace Carlsound
 						}
 					}
 				}
-				// Write outputs parameter changes-----------
-				Steinberg::Vst::IParameterChanges* outParamChanges = data.outputParameterChanges;
 			}
+			return Steinberg::kResultTrue;
+		}
+
+		//-----------------------------------------------------------------------------
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processOutputParameterChanges
+		(
+			Steinberg::Vst::ProcessData& data
+		)
+		{
+			// Write outputs parameter changes-----------
+			Steinberg::Vst::IParameterChanges* outParamChanges = data.outputParameterChanges;
+			//
+			return Steinberg::kResultTrue;
+		}
+
+		//-----------------------------------------------------------------------------
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::process 
+		(
+			Steinberg::Vst::ProcessData& data
+		)
+		{
+			processInputParameterChanges(data);
+			processMidiEvents(data);
+			processAudio(data);
+			processOutputParameterChanges(data);
+			//
 			return Steinberg::kResultOk;
 		}
 		//------------------------------------------------------------------------

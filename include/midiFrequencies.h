@@ -7,12 +7,12 @@
 //
 struct midiData
 {
-	Steinberg::Vst::ParamID noteValue;
+	//Steinberg::Vst::ParamID noteValue;
 	const Steinberg::Vst::TChar *noteName;
 	Steinberg::Vst::ParamValue noteFrequency;
 };
 //
-static class midiFrequencies
+class midiFrequencies
 {
 	midiData midiNoteList[128];
 	//
@@ -21,7 +21,7 @@ public:
 	{
 		for (int i = 0; i < 128; i++)
 		{
-			midiNoteList[i].noteValue = (Steinberg::Vst::ParamID) i;
+			//midiNoteList[i].noteValue = (Steinberg::Vst::ParamID) i;
 			//midiNoteList[i].noteFrequency = (Steinberg::Vst::ParamValue) (27.5 * 2 ^ ((i - 21) / 12));
 		}
 		//
