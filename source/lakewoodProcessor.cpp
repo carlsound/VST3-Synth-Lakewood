@@ -25,12 +25,7 @@ namespace Carlsound
 				return Steinberg::kResultFalse;
 
 			//---create Audio In/Out buses------
-			// we want a stereo Input and a Stereo Output
-			addAudioInput
-			(
-				STR16 ("AudioInput"), 
-				Steinberg::Vst::SpeakerArr::kStereo
-			);
+			// we want a Stereo Output
 			
 			addAudioOutput 
 			(
@@ -56,8 +51,8 @@ namespace Carlsound
 			Steinberg::int32 numOuts
 		)
 		{
-			// we only support one in and output bus and these buses must have the same number of channels
-			if (numIns == 1 && numOuts == 1 && inputs[0] == outputs[0])
+			// we only support one output bus and these buses must have the same number of channels
+			if (1 == numOuts)
 			{
 				return Steinberg::Vst::AudioEffect::setBusArrangements 
 				(
@@ -171,7 +166,7 @@ namespace Carlsound
 						case Steinberg::Vst::Event::kNoteOnEvent:
 						{
 							// here a note On, we may need to play something a keep a trace of the e.noteOn.noteId
-							mNoteActivated = event.noteOn.noteId;
+							mNoteActivated = event.noteOn.pitch;
 							break;
 						}
 						//-----------------------
@@ -179,7 +174,12 @@ namespace Carlsound
 						{
 							// here we have to release the voice associated to this id : e.noteOff.noteId
 							// Note that kNoteExpressionValueEvent event could be send after the note is in released
-							mNoteDeactivated = event.noteOff.noteId;
+							mNoteDeactivated = event.noteOff.pitch;
+							//
+							if (mNoteDeactivated == mNoteActivated)
+							{
+								mNoteActivated = 0;
+							}
 							break;
 						}
 						//-----------------------
@@ -218,7 +218,7 @@ namespace Carlsound
 			Steinberg::Vst::ProcessData& data
 		)
 		{
-			if (data.numOutputs == 0)
+			if (0 == data.numOutputs)
 			{
 				// nothing to do
 				return Steinberg::kResultOk;
@@ -243,36 +243,45 @@ namespace Carlsound
 					data.outputs[0]
 				);
 				//
-				// mark our outputs has not silent
-				data.outputs[0].silenceFlags = 0;
-				//
-				for (int sample = 0; sample < data.numSamples; sample++)
+				if (0 < mNoteActivated)
 				{
-
-					mAmplitude = mOscillator->sinewave(mFrequencies->getNoteFrequency(mNoteActivated));
+					// mark our outputs has not silent
+					data.outputs[0].silenceFlags = 0;
 					//
-					for (int channel = 0; channel < data.outputs->numChannels; channel++)
+					for (int sample = 0; sample < data.numSamples; sample++)
 					{
-						if (data.symbolicSampleSize == Steinberg::Vst::kSample32) //32-Bit
+
+						mAmplitude = mOscillator->sinewave(mFrequencies->getNoteFrequency(mNoteActivated));
+						//
+						for (int channel = 0; channel < data.outputs->numChannels; channel++)
 						{
-							outputBufferAmplitude
-							(
-								static_cast<Steinberg::Vst::Sample32*>(out[channel]),
-								sample,
-								mAmplitude
-							);
-						}
-						else // 64-Bit
-						{
-							outputBufferAmplitude
-							(
-								static_cast<Steinberg::Vst::Sample64*>(out[channel]),
-								sample,
-								mAmplitude
-							);
+							if (data.symbolicSampleSize == Steinberg::Vst::kSample32) //32-Bit
+							{
+								outputBufferAmplitude
+								(
+									static_cast<Steinberg::Vst::Sample32*>(out[channel]),
+									sample,
+									mAmplitude
+								);
+							}
+							else // 64-Bit
+							{
+								outputBufferAmplitude
+								(
+									static_cast<Steinberg::Vst::Sample64*>(out[channel]),
+									sample,
+									mAmplitude
+								);
+							}
 						}
 					}
 				}
+				else
+				{
+					// mark our outputs has not silent
+					data.outputs[0].silenceFlags = 1;
+				}
+				
 			}
 			return Steinberg::kResultTrue;
 		}
