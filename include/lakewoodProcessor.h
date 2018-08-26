@@ -107,7 +107,8 @@ namespace Carlsound
 		//------------------------------------------------------------------------
 		//------------------------------------------------------------------------
 		protected:
-			Steinberg::Vst::ParamValue mParam1 = 0;
+			Steinberg::Vst::ParamValue mParamQtyOctavesNormalized = 0;
+			Steinberg::int32 mParamQtyOctavesPlain = 0;
 			//Steinberg::int16 mParam2 = 0;
 			//bool mBypass = false;
 			Steinberg::int32 mNoteActivated = 0;
@@ -115,8 +116,8 @@ namespace Carlsound
 			//
 			std::shared_ptr<midiFrequencies> mFrequencies;
 			//
-			std::shared_ptr<maxiSettings> mOscillatorSettings;
-			std::shared_ptr<maxiOsc> mOscillator;
+			std::shared_ptr<maxiSettings> mOscillatorSettings[3];
+			std::shared_ptr<maxiOsc> mOscillator[3];
 			//
 			double mAmplitude;
 		};

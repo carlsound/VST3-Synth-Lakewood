@@ -12,8 +12,11 @@ namespace Carlsound
 			//
 			mFrequencies = std::make_shared<midiFrequencies>();
 			//
-			mOscillatorSettings = std::make_shared<maxiSettings>();
-			mOscillator = std::make_shared<maxiOsc>();
+			for (int i = 0; i < 3; i++)
+			{
+				mOscillatorSettings[i] = std::make_shared<maxiSettings>();
+				mOscillator[i] = std::make_shared<maxiOsc>();
+			}
 		}
 
 		//-----------------------------------------------------------------------------
@@ -72,6 +75,14 @@ namespace Carlsound
 		{
 			// here you get, with setup, information about:
 			// sampleRate, processMode, maximum number of samples per audio block
+			//
+			for (int i = 0; i < 3; i++)
+			{
+				mOscillatorSettings[i]->channels = 1;
+				mOscillatorSettings[i]->sampleRate = setup.sampleRate;
+				mOscillatorSettings[i]->bufferSize = setup.symbolicSampleSize;
+			}
+			//
 			return Steinberg::Vst::AudioEffect::setupProcessing (setup);
 		}
 		//-----------------------------------------------------------------------------
@@ -133,7 +144,8 @@ namespace Carlsound
 									==
 									Steinberg::kResultTrue
 									)
-								mParam1 = value;
+								mParamQtyOctavesNormalized = value;
+								mParamQtyOctavesPlain = 2 * mParamQtyOctavesNormalized;
 							break;
 						}
 					}
@@ -166,6 +178,11 @@ namespace Carlsound
 						case Steinberg::Vst::Event::kNoteOnEvent:
 						{
 							// here a note On, we may need to play something a keep a trace of the e.noteOn.noteId
+							for (int i = 0; i < 3; i++)
+							{
+								mOscillator[i]->phaseReset(0);
+							}
+							//
 							mNoteActivated = event.noteOn.pitch;
 							break;
 						}
@@ -248,10 +265,30 @@ namespace Carlsound
 					// mark our outputs has not silent
 					data.outputs[0].silenceFlags = 0;
 					//
+					double rootFrequency = mFrequencies->getNoteFrequency(mNoteActivated);
+					//
 					for (int sample = 0; sample < data.numSamples; sample++)
 					{
-
-						mAmplitude = mOscillator->sinewave(mFrequencies->getNoteFrequency(mNoteActivated));
+						if (0 == mParamQtyOctavesPlain)
+						{
+							mAmplitude = mOscillator[0]->sinewave(rootFrequency);
+						}
+						else if (1 == mParamQtyOctavesPlain)
+						{
+							mAmplitude =
+								mOscillator[0]->sinewave(rootFrequency)
+								+
+								mOscillator[1]->sinewave(rootFrequency * 2);
+						}
+						else
+						{
+							mAmplitude =
+								mOscillator[0]->sinewave(rootFrequency)
+								+
+								mOscillator[1]->sinewave(rootFrequency * 2)
+								+
+								mOscillator[1]->sinewave(rootFrequency * 4);
+						}
 						//
 						for (int channel = 0; channel < data.outputs->numChannels; channel++)
 						{
@@ -330,7 +367,7 @@ namespace Carlsound
 				return Steinberg::kResultFalse;
 			}
 			//
-			mParam1 = savedParam1;
+			mParamQtyOctavesNormalized = savedParam1;
 			//
 			return Steinberg::kResultOk;
 		}
@@ -342,7 +379,7 @@ namespace Carlsound
 		)
 		{
 			// here we need to save the model (preset or project)
-			float toSaveParam1 = mParam1;
+			float toSaveParam1 = mParamQtyOctavesNormalized;
 			//
 			Steinberg::IBStreamer streamer (state, kLittleEndian);
 			streamer.writeFloat (toSaveParam1);

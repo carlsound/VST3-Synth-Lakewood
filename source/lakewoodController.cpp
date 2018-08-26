@@ -65,6 +65,72 @@ namespace Carlsound
 			return Steinberg::kResultOk;
 		}
 
+		
+		//------------------------------------------------------------------------
+		Steinberg::Vst::ParamValue PLUGIN_API LakewoodController::normalizedParamToPlain
+		(
+			Steinberg::Vst::ParamID tag,
+			Steinberg::Vst::ParamValue valueNormalized
+		)
+		{
+			if (kParamQtyOctaves == tag)
+			{
+				return (valueNormalized * 2);
+			}
+			else
+			{
+				return valueNormalized;
+			}
+		}
+
+		//------------------------------------------------------------------------
+		void string128copy(Steinberg::Vst::TChar *str128, std::string &str)
+		{
+			for (int i = 0; i < str.length(); i++)
+			{
+				str128[i] = str[i];
+			}
+			str128[str.length()] = '\0';
+		}
+
+		//------------------------------------------------------------------------
+		Steinberg::Vst::ParamValue PLUGIN_API LakewoodController::plainParamToNormalized
+		(
+			Steinberg::Vst::ParamID tag,
+			Steinberg::Vst::ParamValue value
+		)
+		{
+			if (kParamQtyOctaves == tag)
+			{
+				return (value / 2.0);
+			}
+			else
+			{
+				return value;
+			}
+		}
+
+		//------------------------------------------------------------------------
+		Steinberg::tresult PLUGIN_API LakewoodController::getParamStringByValue
+		(
+			Steinberg::Vst::ParamID tag,
+			Steinberg::Vst::ParamValue valueNormalized,
+			Steinberg::Vst::String128 string
+		)
+		{
+			std::string valuePlainAscii;
+			//
+			if (kParamQtyOctaves == tag)
+			{
+				float valuePlain = (valueNormalized * 2);
+				//
+				valuePlainAscii = std::to_string(valuePlain) + '\0';
+				string128copy(string, valuePlainAscii);
+			}
+			return Steinberg::kResultOk;
+		}
+		
+
 		//-----------------------------------------------------------------------------
 		Steinberg::tresult PLUGIN_API LakewoodController::getMidiControllerAssignment
 		(
