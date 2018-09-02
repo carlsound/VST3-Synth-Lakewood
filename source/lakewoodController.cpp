@@ -6,10 +6,7 @@ namespace Carlsound
 	namespace Lakewood 
 	{
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::initialize 
-		(
-			FUnknown* context
-		)
+		Steinberg::tresult PLUGIN_API LakewoodController::initialize (FUnknown* context)
 		{
 			Steinberg::tresult result = EditController::initialize (context);
 			if (result == Steinberg::kResultTrue)
@@ -30,12 +27,8 @@ namespace Carlsound
 			}
 			return Steinberg::kResultTrue;
 		}
-
 		//------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::setComponentState 
-		(
-			Steinberg::IBStream* state
-		)
+		Steinberg::tresult PLUGIN_API LakewoodController::setComponentState (Steinberg::IBStream* state)
 		{
 			// we receive the current state of the component (processor part)
 			// we read our parameters and bypass value...
@@ -64,14 +57,10 @@ namespace Carlsound
 			//
 			return Steinberg::kResultOk;
 		}
-
-		
 		//------------------------------------------------------------------------
-		Steinberg::Vst::ParamValue PLUGIN_API LakewoodController::normalizedParamToPlain
-		(
+		Steinberg::Vst::ParamValue PLUGIN_API LakewoodController::normalizedParamToPlain (
 			Steinberg::Vst::ParamID tag,
-			Steinberg::Vst::ParamValue valueNormalized
-		)
+			Steinberg::Vst::ParamValue valueNormalized)
 		{
 			if (kParamQtyOctaves == tag)
 			{
@@ -82,7 +71,6 @@ namespace Carlsound
 				return valueNormalized;
 			}
 		}
-
 		//------------------------------------------------------------------------
 		void string128copy(Steinberg::Vst::TChar *str128, std::string &str)
 		{
@@ -92,13 +80,10 @@ namespace Carlsound
 			}
 			str128[str.length()] = '\0';
 		}
-
 		//------------------------------------------------------------------------
-		Steinberg::Vst::ParamValue PLUGIN_API LakewoodController::plainParamToNormalized
-		(
+		Steinberg::Vst::ParamValue PLUGIN_API LakewoodController::plainParamToNormalized (
 			Steinberg::Vst::ParamID tag,
-			Steinberg::Vst::ParamValue value
-		)
+			Steinberg::Vst::ParamValue value)
 		{
 			if (kParamQtyOctaves == tag)
 			{
@@ -109,14 +94,11 @@ namespace Carlsound
 				return value;
 			}
 		}
-
 		//------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::getParamStringByValue
-		(
+		Steinberg::tresult PLUGIN_API LakewoodController::getParamStringByValue (
 			Steinberg::Vst::ParamID tag,
 			Steinberg::Vst::ParamValue valueNormalized,
-			Steinberg::Vst::String128 string
-		)
+			Steinberg::Vst::String128 string)
 		{
 			std::string valuePlainAscii;
 			//
@@ -129,16 +111,12 @@ namespace Carlsound
 			}
 			return Steinberg::kResultOk;
 		}
-		
-
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::getMidiControllerAssignment
-		(
+		Steinberg::tresult PLUGIN_API LakewoodController::getMidiControllerAssignment (
 			Steinberg::int32 busIndex,
 			Steinberg::int16 channel,
 			Steinberg::Vst::CtrlNumber midiControllerNumber,
-			Steinberg::Vst::ParamID& id
-		)
+			Steinberg::Vst::ParamID& id)
 		{
 			//throw std::logic_error("The method or operation is not implemented.");
 			if (busIndex == 0 && channel == 0)
@@ -161,30 +139,24 @@ namespace Carlsound
 			}
 			return Steinberg::kResultFalse;
 		}
-		
 		/*
 		//-----------------------------------------------------------------------------
 		//------------------------------------------------------------------------
-		Steinberg::int32 LakewoodController::getNoteExpressionCount
-		(
+		Steinberg::int32 LakewoodController::getNoteExpressionCount (
 			Steinberg::int32 busIndex, 
-			Steinberg::int16 channel
-		)
+			Steinberg::int16 channel)
 		{
 			// we accept only the first bus and 1 channel
 			if (busIndex == 0 && channel == 0)
 				return 1;
 			return 0;
 		}
-
 		//------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::getNoteExpressionInfo
-		(
+		Steinberg::tresult PLUGIN_API LakewoodController::getNoteExpressionInfo (
 			Steinberg::int32 busIndex, 
 			Steinberg::int16 channel,
 			Steinberg::int32 noteExpressionIndex,
-			Steinberg::Vst::NoteExpressionTypeInfo& info
-		)
+			Steinberg::Vst::NoteExpressionTypeInfo& info)
 		{
 			// we accept only the first bus and 1 channel 
 			// and only 1 Note Expression (tuning)
@@ -217,16 +189,13 @@ namespace Carlsound
 			}
 			return Steinberg::kResultFalse;
 		}
-
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::getNoteExpressionStringByValue
-		(
+		Steinberg::tresult PLUGIN_API LakewoodController::getNoteExpressionStringByValue (
 			Steinberg::int32 busIndex, 
 			Steinberg::int16 channel,
 			Steinberg::Vst::NoteExpressionTypeID id,
 			Steinberg::Vst::NoteExpressionValue valueNormalized,
-			Steinberg::Vst::String128 string
-		);
+			Steinberg::Vst::String128 string)
 		{
 			// here we use the id (not the index)
 			if (busIndex == 0 && channel == 0 && id == kTuningTypeID)
@@ -243,14 +212,12 @@ namespace Carlsound
 		}
 
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodController::getNoteExpressionValueByString
-		(
+		Steinberg::tresult PLUGIN_API LakewoodController::getNoteExpressionValueByString (
 			Steinberg::int32 busIndex, 
 			Steinberg::int16 channel, 
 			Steinberg::Vst::NoteExpressionTypeID id,
 			const Steinberg::Vst::TChar* string, 
-			Steinberg::Vst::NoteExpressionValue& valueNormalized
-		);
+			Steinberg::Vst::NoteExpressionValue& valueNormalized)
 		{
 			// here we use the id (not the index)
 			if (busIndex == 0 && channel == 0 && id == kTuningTypeID)
@@ -266,11 +233,6 @@ namespace Carlsound
 			}
 			return Steinberg::kResultFalse;
 		}
-
 		*/
-
-		//-----------------------------------------------------------------------------
-
-	//------------------------------------------------------------------------
 	} // namespace Lakewood
 } // namespace Carlsound

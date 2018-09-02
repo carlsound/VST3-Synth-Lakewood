@@ -1,3 +1,4 @@
+#include "../include/lakewoodProcessorIncludes.h"
 #include "../include/lakewoodProcessor.h"
 //
 namespace Carlsound 
@@ -18,7 +19,6 @@ namespace Carlsound
 				mOscillator[i] = std::make_shared<maxiOsc>();
 			}
 		}
-
 		//-----------------------------------------------------------------------------
 		Steinberg::tresult PLUGIN_API LakewoodProcessor::initialize (FUnknown* context)
 		{
@@ -46,13 +46,11 @@ namespace Carlsound
 			return Steinberg::kResultTrue;
 		}
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::setBusArrangements 
-		(
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::setBusArrangements (
 			Steinberg::Vst::SpeakerArrangement* inputs,
 			Steinberg::int32 numIns,
 			Steinberg::Vst::SpeakerArrangement* outputs,
-			Steinberg::int32 numOuts
-		)
+			Steinberg::int32 numOuts)
 		{
 			// we only support one output bus and these buses must have the same number of channels
 			if (1 == numOuts)
@@ -68,10 +66,7 @@ namespace Carlsound
 			return Steinberg::kResultFalse;
 		}
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::setupProcessing 
-		(
-			Steinberg::Vst::ProcessSetup& setup
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::setupProcessing (Steinberg::Vst::ProcessSetup& setup)
 		{
 			// here you get, with setup, information about:
 			// sampleRate, processMode, maximum number of samples per audio block
@@ -86,10 +81,7 @@ namespace Carlsound
 			return Steinberg::Vst::AudioEffect::setupProcessing (setup);
 		}
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::setActive 
-		(
-			Steinberg::TBool state
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::setActive (Steinberg::TBool state)
 		{
 			if (state) // Initialize
 			{
@@ -105,22 +97,17 @@ namespace Carlsound
 		}
 		//-----------------------------------------------------------------------------
 		template <class T>
-		inline void LakewoodProcessor::outputBufferAmplitude
-		(
+		inline void LakewoodProcessor::outputBufferAmplitude(
 			T outBuffer,
 			const int sampleLocation,
-			const double amplitudeValue
-		)
+			const double amplitudeValue)
 		{
 			outBuffer = outBuffer + sampleLocation; // pointer arithmetic
 			//
 			*outBuffer = amplitudeValue;
 		}
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::processInputParameterChanges
-		(
-			Steinberg::Vst::ProcessData& data
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processInputParameterChanges (Steinberg::Vst::ProcessData& data)
 		{
 			//--- Read inputs parameter changes-----------
 			if (data.inputParameterChanges)
@@ -153,12 +140,8 @@ namespace Carlsound
 			}
 			return Steinberg::kResultTrue;
 		}
-
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::processMidiEvents
-		(
-			Steinberg::Vst::ProcessData& data
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processMidiEvents (Steinberg::Vst::ProcessData& data)
 		{
 			// get the input event queue
 			Steinberg::Vst::IEventList* inputEvents = data.inputEvents;
@@ -228,12 +211,8 @@ namespace Carlsound
 			}
 			return Steinberg::kResultTrue;
 		}
-
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::processAudio
-		(
-			Steinberg::Vst::ProcessData& data
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processAudio (Steinberg::Vst::ProcessData& data)
 		{
 			if (0 == data.numOutputs)
 			{
@@ -322,24 +301,16 @@ namespace Carlsound
 			}
 			return Steinberg::kResultTrue;
 		}
-
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::processOutputParameterChanges
-		(
-			Steinberg::Vst::ProcessData& data
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::processOutputParameterChanges (Steinberg::Vst::ProcessData& data)
 		{
 			// Write outputs parameter changes-----------
 			Steinberg::Vst::IParameterChanges* outParamChanges = data.outputParameterChanges;
 			//
 			return Steinberg::kResultTrue;
 		}
-
 		//-----------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::process 
-		(
-			Steinberg::Vst::ProcessData& data
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::process (Steinberg::Vst::ProcessData& data)
 		{
 			processInputParameterChanges(data);
 			processMidiEvents(data);
@@ -349,10 +320,7 @@ namespace Carlsound
 			return Steinberg::kResultOk;
 		}
 		//------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::setState 
-		(
-			Steinberg::IBStream* state
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::setState (Steinberg::IBStream* state)
 		{
 			if (!state)
 				return Steinberg::kResultFalse;
@@ -371,12 +339,8 @@ namespace Carlsound
 			//
 			return Steinberg::kResultOk;
 		}
-
 		//------------------------------------------------------------------------
-		Steinberg::tresult PLUGIN_API LakewoodProcessor::getState 
-		(
-			Steinberg::IBStream* state
-		)
+		Steinberg::tresult PLUGIN_API LakewoodProcessor::getState (Steinberg::IBStream* state)
 		{
 			// here we need to save the model (preset or project)
 			float toSaveParam1 = mParamQtyOctavesNormalized;
@@ -386,6 +350,5 @@ namespace Carlsound
 			//
 			return Steinberg::kResultOk;
 		}
-		//------------------------------------------------------------------------
 	} // namespace Lakewood
 } // namespace Carlsound

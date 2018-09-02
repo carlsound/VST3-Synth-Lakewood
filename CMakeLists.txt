@@ -1,6 +1,7 @@
 
 set(synth_sources
     include/lakewoodController.h
+	include/lakewoodControllerIncludes.h
     source/lakewoodController.cpp
      #---
     source/lakewoodFactory.cpp
@@ -8,6 +9,7 @@ set(synth_sources
     include/lakewoodParameters.h
     #---
     include/lakewoodProcessor.h
+	include/lakewoodProcessorIncludes.h
     source/lakewoodProcessor.cpp
 	#---
     include/lakewoodUIDs.h
